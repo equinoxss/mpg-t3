@@ -66,7 +66,7 @@ showDialog('connecting');
 // Connection object to Masamune server
 // var host = 'http://localhost:9999/masamune'
 // var host = 'http://salty-escarpment-4501.herokuapp.com/'
-var host = window.location.href.contains('localhost') ? 'http://localhost:9999' : 'http://salty-escarpment-4501.herokuapp.com';
+var host = window.location.href.contains('localhost') ? 'http://localhost:9999' : 'http://mpg-t3.herokuapp.com';
 var gameServer = new Masamune(host + '/masamune', {
   debug: true
 });
