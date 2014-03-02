@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MPG: T3</title>
+    <link rel="stylesheet" type="text/css" href="stylesheets/base.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/layout.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/skeleton.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/game.css">
+    <script src="scripts/underscore.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="board">
+        <div class="row">
+          <div class="three columns">
+            <div id="player1-tray">
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+            </div>
+          </div>
+          <div class="ten columns">
+            <div class="table" id="board">
+              <div class="row">
+                <div class="cell" data-idx="0"></div>
+                <div class="cell" data-idx="1"></div>
+                <div class="cell" data-idx="2"></div>
+              </div>
+              <div class="row">
+                <div class="cell" data-idx="3"></div>
+                <div class="cell" data-idx="4"></div>
+                <div class="cell" data-idx="5"></div>
+              </div>
+              <div class="row">
+                <div class="cell" data-idx="6"></div>
+                <div class="cell" data-idx="7"></div>
+                <div class="cell" data-idx="8"></div>
+              </div>
+            </div>
+          </div>
+          <div class="three columns">
+            <div id="player2-tray">
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+              <div class="piece"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog container" id="dialog">
+      <div class="scrim"></div>
+      <div class="content" id="content"></div>
+    </div>
+
+    <script id="template-connecting" type="text/html">
+      <h3>{MPG}</h3><h2>Tic-Tac-Toh</h2>
+      <h3>Connecting to network...</h3>
+    </script>
+
+    <script id="template-join-game" type="text/html">
+      <h3>{MPG}</h3><h2>Tic-Tac-Toh</h2>
+      <br/>
+      <div class="row">
+        <div class="three columns">
+          <div class="text-left">
+            <a href="#" class="button" id="new-game">Start New Game</a>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="three columns">
+          <div class="text-left">
+            <a href="#" class="button" id="join-game">Join A Game</a>
+          </div>
+        </div>
+        <div class="columns two">
+          <div class="text-left">
+            <input type="text" id="game-id" />
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script id="template-waiting" type="text/html">
+      <h3>{MPG}</h3><h2>Tic-Tac-Toh</h2>
+      <br/>
+      <h4>Waiting for players...</h4>
+      <h4>Game ID: <%= data.name %></h4>
+    </script>
+
+    <script id="template-results" type="text/html">
+      <h3>{MPG}</h3><h2>Tic-Tac-Toh</h2>
+      <br/>
+      <h4><%= data.winner %></h4>
+      <br/>
+      <div class="text-center">
+        <a href="#" class="button" id="another-game">Play Again?</a>
+      </div>
+    </script>
+
+    <script src="scripts/sockjs.js"></script>
+    <script src="scripts/masamune.js"></script>
+    <script src="scripts/main.js"></script>
+  </body>
+</html>

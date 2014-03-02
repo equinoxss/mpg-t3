@@ -1,0 +1,16 @@
+{
+  "name": "masamune",
+  "version": "0.0.1",
+  "description": "A multiplayer server for JavaScript based games.",
+  "main": "masamune.js",
+  "author": "Dan Ristic",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "sockjs": "~0.3.8",
+    "rbytes": "~1.0.0",
+    "coffee-script": "~1.7.1"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
