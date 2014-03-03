@@ -1,26 +1,3 @@
-if (!String.prototype.contains) {
-  String.prototype.contains = function (str) {
-    return this.indexOf(str) != -1;
-  };
-}
-
-Element.prototype.hasClassName = function(name) {
-  return new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)").test(this.className);
-};
-
-Element.prototype.addClassName = function(name) {
-  if (!this.hasClassName(name)) {
-    this.className = this.className ? [this.className, name].join(' ') : name;
-  }
-};
-
-Element.prototype.removeClassName = function(name) {
-  if (this.hasClassName(name)) {
-    var c = this.className;
-    this.className = c.replace(new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)", "g"), "");
-  }
-};
-
 // Page templates
 var pages = {
   connecting: _.template(document.querySelector('#template-connecting').innerHTML, null, { variable: 'data' }),
@@ -161,6 +138,7 @@ var tray1 = document.querySelector("#player1-tray").querySelectorAll(".piece"),
     cells = board.querySelectorAll(".cell");
 
 function renderGame() {
+  renderCanvas();
   for (var i = 0; i < tray1.length; i++) {
     tray1[i].innerHTML = model.trays[0][i] || "";
   }

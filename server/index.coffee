@@ -18,8 +18,8 @@ masamune.onGameCreated (game) ->
   board = null
 
   setupGame = () ->
-    trays = [ ["X","X","X","X","X","X"],
-            ["O","O","O","O","O","O"] ]
+    trays = [ ["X","X","X","X","X"],
+            ["O","O","O","O","O"] ]
     board = [" "," "," "," "," "," "," "," "," "]
     currentPlayer = -1
     started = false
