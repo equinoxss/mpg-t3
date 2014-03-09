@@ -40,13 +40,13 @@ Rectangle = (function() {
     this.y2 = y2;
   };
 
-  Rectangle.prototype._checkPt = function(tx, ty) {
+  Rectangle.prototype.contains = function(tx, ty) {
     return (tx >= this.x && tx <= this.x2) && (ty >= this.y && ty <= this.y2);
   };
 
-  Rectangle.prototype.contains = function(pt) {
-    return this._checkPt(pt.x, pt.y);
-  };
+  // Rectangle.prototype.contains = function(pt) {
+  //   return this._checkPt(pt.x, pt.y);
+  // };
 
   Rectangle.prototype.intersects = function(rect) {
     if (this.x2 < rect.x || this.y2 < rect.y || this.x > rect.x2 || this.y > rect.y2) {

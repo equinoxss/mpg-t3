@@ -5,11 +5,14 @@ port = process.env.PORT ? 9999
 server = http.createServer()
 masamune.installHandlers server
 
-masamune.onGameCreated (game) ->
+masamune.onGameCreated (game, options = {}) ->
   console.log "Game #{game.name} created"
+  console.log "Game options from client:", options
 
   game.config
-    maxPlayers: 2
+    maxPlayers: options.numPlayers || 2
+
+  console.log "Game options: ", game.options
 
   players = 0
   currentPlayer = -1
@@ -20,12 +23,18 @@ masamune.onGameCreated (game) ->
   setupGame = () ->
     trays = [ ["X","X","X","X","X"],
             ["O","O","O","O","O"] ]
-    board = [" "," "," "," "," "," "," "," "," "]
+    trays.push ["@","@","@","@","@"] if game.options.maxPlayers > 2
+    trays.push ["*","*","*","*","*"] if game.options.maxPlayers > 3
+    # board = [] # [" "," "," "," "," "," "," "," "," "]
+    num = Math.pow(game.options.maxPlayers+1,2) + 1
+    board = while num -= 1
+      " "
     currentPlayer = -1
     started = false
     game.set 'round', 1
     game.set 'trays', trays
     game.set 'board', board
+    game.set 'playerCount', game.options.maxPlayers
 
   startGame = () ->
     game.send 'game-start'
@@ -53,7 +62,7 @@ masamune.onGameCreated (game) ->
     game.end()
 
   nextTurn = () ->
-    currentPlayer = ++currentPlayer % 2
+    currentPlayer = ++currentPlayer % players
     game.send 'player-turn', currentPlayer
 
   game.on 'place-piece', (message, conn) ->
