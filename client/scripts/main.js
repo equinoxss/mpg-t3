@@ -155,11 +155,6 @@ gameServer.on('game-tie', function(message) {
   showDialog('results', {winner: 'Game is a draw.'});
 });
 
-// var tray1 = document.querySelector("#player1-tray").querySelectorAll(".piece"),
-//     tray2 = document.querySelector("#player2-tray").querySelectorAll(".piece"),
-//     board = document.querySelector("#board"),
-//     cells = board.querySelectorAll(".cell");
-
 function updateViewModel() {
   for (var i=0;i<viewModel.playables.length;i++) {
     viewModel.playables[i].symbol = model.board[i];
@@ -168,15 +163,6 @@ function updateViewModel() {
 
 function renderGame() {
   renderCanvas();
-  // for (var i = 0; i < tray1.length; i++) {
-  //   tray1[i].innerHTML = model.trays[0][i] || "";
-  // }
-  // for (var i = 0; i < tray2.length; i++) {
-  //   tray2[i].innerHTML = model.trays[1][i] || "";
-  // }
-  // for (var i = 0; i < cells.length; i++) {
-  //   cells[i].innerHTML = model.board[i];
-  // }  
 };
 
 gameServer.on("reset-board", function() {

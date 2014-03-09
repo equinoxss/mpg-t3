@@ -183,8 +183,6 @@ function renderFrame() {
   gameContext.save();
   gameContext.globalAlpha = 0.1;
   gameContext.fillStyle = "black";
-  // gameContext.clearRect(viewModel.grid[0][0].x, viewModel.grid[0][0].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
-  // gameContext.fillRect(viewModel.grid[0][0].x, viewModel.grid[0][0].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
   gameContext.clearRect(viewModel.grid[0][viewModel.cols-1].x, viewModel.grid[0][viewModel.cols-1].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
   gameContext.fillRect(viewModel.grid[0][viewModel.cols-1].x, viewModel.grid[0][viewModel.cols-1].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
   gameContext.restore();
@@ -196,9 +194,6 @@ function renderFrame() {
 
 function renderTrays() {
   if (model.trays == null) { return; }
-  // for (var r = 0; r < model.trays[0].length; r++) {
-  //   drawPiece(model.trays[0][r] || "", viewModel.grid[r][0]);
-  // };
   for (var r = 0; r < model.trays[model.playerNumber-1].length; r++) {
     drawPiece(model.trays[model.playerNumber-1][r] || "", viewModel.grid[r][viewModel.cols-1]);
   };
@@ -206,11 +201,6 @@ function renderTrays() {
 
 function renderBoard() {
   if (model.viewModel == null) { return; }
-  // for (var i = 0; i < model.viewModel.length; i++) {
-  //   var r = Math.floor(i / (viewModel.players + 1)),
-  //       c = i % (viewModel.players + 1);
-  //   drawPiece(model.viewModel[i], r + 1, c + 2);
-  // }  
   for (var i=0;i<viewModel.playables.length;i++) {
     renderCell(viewModel.playables[i]);
   }
