@@ -1,9 +1,11 @@
-var board = {
+var viewModel = {
   allowance: 10
 };
-var canvas = document.querySelector('#canvas');
-var context = canvas.getContext("2d")
-var pieces = {};
+var gameCanvas = document.querySelector('#game-layer'),
+    gameContext = gameCanvas.getContext("2d"),
+    uiCanvas = document.querySelector('#ui-layer'),
+    uiContext = gameCanvas.getContext("2d"),
+    pieces = {};
 
 function initRendering() {
   pieces.X = new Image(); pieces.X.src = "images/X.png";
@@ -12,141 +14,239 @@ function initRendering() {
 }
 
 function setCanvasSize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  gameCanvas.width = uiCanvas.width = window.innerWidth;
+  gameCanvas.height = uiCanvas.height = window.innerHeight;
 };
 
 function setBoardSize(players) {
-  board.players = players;
-  board.rows = 3 + players;
-  board.cols = 5 + players;
+  viewModel.players = players;
+  viewModel.rows = 3 + players;
+  viewModel.cols = 3 + players;
+  calcGrid(true);
+  eraseCanvas();
+
+  viewModel.playables = [];
+  for (var r = 1; r < viewModel.grid.length - 1; r++) {
+    for (var c = 0; c <= model.playerCount; c++) {
+      viewModel.playables.push(viewModel.grid[r][c]);
+    }
+  }
+
 }
 
-function calcGrid() {
-  board.width = canvas.clientWidth;
-  board.height = canvas.clientHeight;
+function calcGrid(force) {
+  viewModel.width = gameCanvas.clientWidth;
+  viewModel.height = gameCanvas.clientHeight;
 
-  board.cellSize = Math.min(Math.floor(board.width / board.cols), Math.floor(board.height / board.rows)) - board.allowance;
+  viewModel.cellSize = Math.min(Math.floor(viewModel.width / viewModel.cols), Math.floor(viewModel.height / viewModel.rows)) - viewModel.allowance;
 
-  board.topLeft = {
-    x: (board.width - (board.cellSize * board.cols)) / 2,
-    y: (board.height - (board.cellSize * board.rows)) / 2,
-  }
+  viewModel.topLeft = {
+    x: (viewModel.width - (viewModel.cellSize * viewModel.cols)) / 2,
+    y: (viewModel.height - (viewModel.cellSize * viewModel.rows)) / 2,
+  };
 
-  board.grid = [];
-  for (var r = 0; r < board.rows; r++) {
-    board.grid.push([]);
-    for (var c = 0; c < board.cols; c++) {
-      var x = board.topLeft.x + (c * board.cellSize),
-          y = board.topLeft.y + (r * board.cellSize);
-      board.grid[r].push({
-        x: x, 
-        y: y,
-        box: new Rectangle(x, y, x + board.cellSize, y + board.cellSize)
-      });
+  force = force || false;
+  if (viewModel.grid && !force) {
+    for (var r = 0; r < viewModel.rows; r++) {
+      for (var c = 0; c < viewModel.cols; c++) {
+        var x = viewModel.topLeft.x + (c * viewModel.cellSize),
+            y = viewModel.topLeft.y + (r * viewModel.cellSize);
+        cell = viewModel.grid[r][c];
+        cell.x = x;
+        cell.y = y;
+        cell.box = new Rectangle(x, y, x + viewModel.cellSize, y + viewModel.cellSize);
+      }
     }
+  } else {
+    viewModel.grid = [];
+    for (var r = 0; r < viewModel.rows; r++) {
+      viewModel.grid.push([]);
+      for (var c = 0; c < viewModel.cols; c++) {
+        var x = viewModel.topLeft.x + (c * viewModel.cellSize),
+            y = viewModel.topLeft.y + (r * viewModel.cellSize);
+        viewModel.grid[r].push({
+          x: x, 
+          y: y,
+          box: new Rectangle(x, y, x + viewModel.cellSize, y + viewModel.cellSize)
+        });
+      }
+    }
+
   }
 
-  console.log(board);
 };
 
-function renderFrame() {
-  context.save();
-  context.globalAlpha = 0.1;
-  context.fillStyle = "black";
-  context.clearRect(board.grid[0][0].x, board.grid[0][0].y, board.cellSize, board.cellSize * board.rows);
-  context.fillRect(board.grid[0][0].x, board.grid[0][0].y, board.cellSize, board.cellSize * board.rows);
-  context.clearRect(board.grid[0][6].x, board.grid[0][6].y, board.cellSize, board.cellSize * board.rows);
-  context.fillRect(board.grid[0][6].x, board.grid[0][6].y, board.cellSize, board.cellSize * board.rows);
-  context.restore();
-
-  context.save();
-  context.lineWidth = 5;
-  context.lineCap = "round";
-  context.strokeStyle = "black";
-
-  for (var r = 1; r < board.grid.length - 1; r++) {
-    for (var c = 2; c < board.grid.length; c++) {
-      context.strokeRect(board.grid[r][c].x, board.grid[r][c].y, board.cellSize, board.cellSize);
+function clickToCell(event) {
+  for (var i=0;i<viewModel.playables.length;i++) {
+    if (viewModel.playables[i].box.contains(event.x, event.y)) {
+      return i;
     }
   }
+  return null;
+}
 
-  context.restore();
-};
-
-function drawPiece(sym, r, c) {
-  if (sym == "") { return; }
+function drawPiece(sym, cell) {
+  if (sym == "" || sym == " ") { return; }
 
   try {
-    var box = board.grid[r][c].box.clone();
-    box.inset(board.cellSize * .2, board.cellSize * .2);
-    context.drawImage(pieces[sym], box.x, box.y, box.width(), box.width());
-    return;
+    // var box = cell.box.clone();
+    // box.inset(viewModel.cellSize * .2, viewModel.cellSize * .2);
+    // gameContext.drawImage(pieces[sym], box.x, box.y, box.width(), box.width());
+    // return;
+
+    gameContext.save();
+    gameContext.lineWidth = 12;
+    gameContext.strokeStyle = "black";
+
+    var r = cell.box.clone();
+    r.inset(viewModel.cellSize * .2, viewModel.cellSize * .2);
 
     if (sym == "X") {
-      // r = board.grid[r][c].box;
-      // r.inset(board.cellSize * .2, board.cellSize * .2);
-      // context.beginPath();
-      // context.moveTo(r.x, r.y);
-      // context.lineTo(r.x2, r.y2);
-      // context.moveTo(r.x, r.y2);
-      // context.lineTo(r.x2, r.y);
-      // context.closePath();
-      // context.stroke();
+      gameContext.beginPath();
+      gameContext.moveTo(r.x, r.y);
+      gameContext.lineTo(r.x2, r.y2);
+      gameContext.moveTo(r.x, r.y2);
+      gameContext.lineTo(r.x2, r.y);
+      gameContext.closePath();
+      gameContext.stroke();
     } else if (sym == "O") {
-      r = board.grid[r][c].box;
-      r.inset(board.cellSize * .2, board.cellSize * .2);
+      radius = r.width() / 2;
 
-    } else if (sym == "+") {
-      
-    } else if (sym == "-") {
-      
+      gameContext.beginPath();
+      gameContext.arc(r.x+radius,r.y+radius,radius,0,2*Math.PI);
+      gameContext.closePath();
+      gameContext.stroke();
+
+    } else if (sym == "@") {
+      r.outset(viewModel.cellSize * .05, viewModel.cellSize * .05)
+      half = r.width() / 2;
+      gameContext.beginPath();
+      gameContext.moveTo(r.x+half, r.y);
+      gameContext.lineTo(r.x+half, r.y2);
+      gameContext.moveTo(r.x, r.y+half);
+      gameContext.lineTo(r.x2, r.y+half);
+      gameContext.closePath();
+      gameContext.stroke();
+
+      r.inset(10,10);
+      radius = r.width() / 2;
+      gameContext.beginPath();
+      gameContext.arc(r.x+radius,r.y+radius,radius,0,2*Math.PI);
+      gameContext.closePath();
+      gameContext.stroke();
+    } else if (sym == "*") {
+      r.inset(viewModel.cellSize * .05, viewModel.cellSize * .05);
+      gameContext.globalCompositeOperation = "xor";
+      gameContext.beginPath();
+      gameContext.moveTo(r.x, r.y);
+      gameContext.lineTo(r.x2, r.y);
+      gameContext.lineTo(r.x2, r.y2);
+      gameContext.lineTo(r.x, r.y2);
+      gameContext.lineTo(r.x, r.y);
+      gameContext.lineTo(r.x2, r.y);
+      gameContext.stroke();
+      gameContext.closePath();
+
+      gameContext.beginPath();
+      gameContext.moveTo(r.x, r.y);
+      gameContext.lineTo(r.x2, r.y2);
+      gameContext.moveTo(r.x, r.y2);
+      gameContext.lineTo(r.x2, r.y);
+      gameContext.stroke();
+      gameContext.closePath();
     }
   } catch (e) {
     // ignore
+  }
+
+  gameContext.restore();
+};
+
+function renderCell(cell) {
+  gameContext.save();
+  gameContext.clearRect(cell.x, cell.y, viewModel.cellSize, viewModel.cellSize);
+  if (cell.status) {
+    if (cell.status == "bad") gameContext.fillStyle = "red";
+    else if (cell.status == "win") gameContext.fillStyle = "green";
+    gameContext.fillRect(cell.x, cell.y, viewModel.cellSize, viewModel.cellSize);
+  }
+  gameContext.lineWidth = 5;
+  gameContext.lineCap = "round";
+  gameContext.strokeStyle = "black";
+  gameContext.strokeRect(cell.x, cell.y, viewModel.cellSize, viewModel.cellSize);
+  gameContext.restore();
+
+  drawPiece(cell.symbol, cell);
+}
+
+function renderFrame() {
+  gameContext.save();
+  gameContext.globalAlpha = 0.1;
+  gameContext.fillStyle = "black";
+  // gameContext.clearRect(viewModel.grid[0][0].x, viewModel.grid[0][0].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
+  // gameContext.fillRect(viewModel.grid[0][0].x, viewModel.grid[0][0].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
+  gameContext.clearRect(viewModel.grid[0][viewModel.cols-1].x, viewModel.grid[0][viewModel.cols-1].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
+  gameContext.fillRect(viewModel.grid[0][viewModel.cols-1].x, viewModel.grid[0][viewModel.cols-1].y, viewModel.cellSize, viewModel.cellSize * viewModel.rows);
+  gameContext.restore();
+
+  for (var i=0;i<viewModel.playables.length;i++) {
+    renderCell(viewModel.playables[i]);    
   }
 };
 
 function renderTrays() {
   if (model.trays == null) { return; }
-  for (var r = 0; r < tray1.length; r++) {
-    drawPiece(model.trays[0][r] || "", r, 0);
-  };
-  for (var r = 0; r < tray1.length; r++) {
-    drawPiece(model.trays[1][r] || "", r, 6);
+  // for (var r = 0; r < model.trays[0].length; r++) {
+  //   drawPiece(model.trays[0][r] || "", viewModel.grid[r][0]);
+  // };
+  for (var r = 0; r < model.trays[model.playerNumber-1].length; r++) {
+    drawPiece(model.trays[model.playerNumber-1][r] || "", viewModel.grid[r][viewModel.cols-1]);
   };
 };
 
 function renderBoard() {
-  if (model.board == null) { return; }
-  for (var i = 0; i < cells.length; i++) {
-    var r = Math.floor(i / (board.players + 1)),
-        c = i % (board.players + 1);
-    drawPiece(model.board[i], r + 1, c + 2);
-  }  
+  if (model.viewModel == null) { return; }
+  // for (var i = 0; i < model.viewModel.length; i++) {
+  //   var r = Math.floor(i / (viewModel.players + 1)),
+  //       c = i % (viewModel.players + 1);
+  //   drawPiece(model.viewModel[i], r + 1, c + 2);
+  // }  
+  for (var i=0;i<viewModel.playables.length;i++) {
+    renderCell(viewModel.playables[i]);
+  }
 };
+
+function eraseCanvas() {
+  gameContext.clearRect(0,0,gameCanvas.width,gameCanvas.height);
+}
 
 function renderCanvas() {
+  eraseCanvas();
   renderFrame();
   renderTrays();
-
-  context.save();
-  context.lineWidth = 3.5;
-  context.strokeStyle = "black";
   renderBoard();
-  context.restore();
-
 };
+
+function highlightCell(index, status, duration) {
+  viewModel.playables[index].status = status;
+  renderBoard();
+  if (duration) {
+    clearHighlight = function() {
+      viewModel.playables[index].status = null;
+      renderBoard();
+    }
+    setTimeout(clearHighlight, duration);
+  }
+}
 
 window.addEventListener('resize', function (event) {
   setCanvasSize();
   calcGrid();
-  renderGame();
+  renderCanvas();
 })
 
 initRendering();
 setCanvasSize();
 setBoardSize(2);
-calcGrid();
 renderCanvas();
 

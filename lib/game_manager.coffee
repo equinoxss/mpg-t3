@@ -71,7 +71,7 @@ class GameManager
         game = @createGame name
 
         if @gameHandler?
-          @gameHandler game
+          @gameHandler game, message.payload
 
       if game instanceof Game
         unless game.isFull()
