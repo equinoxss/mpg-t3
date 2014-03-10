@@ -1,3 +1,12 @@
+var drawingSync = null;
+if (window.requestAnimationFrame) drawingSync = window.requestAnimationFrame
+else if (window.webkitRequestAnimationFrame) drawingSync = window.webkitRequestAnimationFrame
+else if (window.mozRequestAnimationFrame) drawingSync = window.mozRequestAnimationFrame
+else if (window.oRequestAnimationFrame) drawingSync = window.oRequestAnimationFrame
+else if (window.msRequestAnimationFrame) drawingSync = window.msRequestAnimationFrame
+else drawingSync = function(callback) { return setTimeout(callback, 17); }
+
+
 var viewModel = {
   allowance: 10
 };
@@ -234,9 +243,3 @@ window.addEventListener('resize', function (event) {
   calcGrid();
   renderCanvas();
 })
-
-initRendering();
-setCanvasSize();
-setBoardSize(2);
-renderCanvas();
-

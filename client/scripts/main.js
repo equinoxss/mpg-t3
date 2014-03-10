@@ -1,3 +1,14 @@
+// Save game model
+var game,
+    state = 'starting',
+    model = {
+      playerCount: 2,
+      playerNumber: null,
+      trays: null,
+      board: [],
+      round: 1
+    };
+
 // Page templates
 var pages = {
   connecting: _.template(document.querySelector('#template-connecting').innerHTML, null, { variable: 'data' }),
@@ -8,6 +19,7 @@ var pages = {
 
 var dialogEl = document.querySelector('#dialog');
 function showDialog(name, data) {
+  return;
   render = pages[name];
   text = render(data);
   requestAnimationFrame(function () {
@@ -21,8 +33,12 @@ function hideDialog() {
 };
 
 var clickMap = {
-  'new-game' : function(event) { joinGame(); },
-  'join-game' : function(event) { joinGame(document.querySelector('#game-id').value || " "); },
+  'new-game' : function(event) { howManyPlayers(); },
+  'what-game' : function(event) { joinWhichGame(); },
+  '2p-game' : function(event) { joinGame({np: 2}); },
+  '3p-game' : function(event) { joinGame({np: 3}); },
+  '4p-game' : function(event) { joinGame({np: 4}); },
+  'join-game' : function(event) { joinGame({gn: document.querySelector('#game-id').value || " "}); },
   'another-game' : function(event) { gameServer.send('reset-game'); }
 }
 
@@ -33,6 +49,11 @@ document.addEventListener('click', function (event) {
       clickMap[id](event);
     } else if (event.target.className == "cell") {
       gameServer.send('place-piece', {location: event.target.dataset.idx}, function(){})
+    } else if (state == "starting") {
+      var id = clickToButton(event);
+      if (id && clickMap[id]) {
+        clickMap[id]();
+      }
     } else if (state == 'playing') {
       var idx = clickToCell(event);
       if (idx !== null) {
@@ -41,9 +62,6 @@ document.addEventListener('click', function (event) {
     }
   }
 });
-
-// Show initial connecting page
-showDialog('connecting');
 
 // Connection object to Masamune server
 // var host = 'http://localhost:9999/masamune'
@@ -60,17 +78,6 @@ gameServer.on('connected', function () {
 gameServer.on('disconnected', function () {
   showDialog('connecting');
 });
-
-// Save game view-model
-var game,
-    state = 'starting',
-    model = {
-      playerCount: 2,
-      playerNumber: null,
-      trays: null,
-      board: [],
-      round: 1
-    };
 
 gameServer.on("assign-player-number", function (message) {
   try {
@@ -89,8 +96,8 @@ gameServer.on("invalid-move", function(message) {
   highlightCell(message.location, 'bad', 1000);
 });
 
-function joinGame(name) {
-  gameServer.joinGame({ name: name, numPlayers: 2 }, function (serverGame) {
+function joinGame(options) {
+  gameServer.joinGame({ name: options.gn, numPlayers: options.np }, function (serverGame) {
     game = serverGame;
     state = 'waiting';
 
@@ -170,3 +177,12 @@ gameServer.on("reset-board", function() {
   //   cells[i].removeClassName("green");
   // }  
 });
+
+initRendering();
+setCanvasSize();
+setBoardSize(2);
+renderCanvas();
+
+// Show initial connecting page
+// showDialog('connecting');
+showGameStart();

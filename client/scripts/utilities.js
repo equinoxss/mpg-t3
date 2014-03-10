@@ -57,7 +57,9 @@ Rectangle = (function() {
 
   Rectangle.prototype.translate = function(dx, dy) {
     this.x += dx;
+    this.x2 += dx;
     this.y += dy;
+    this.y2 += dy;
     return this;
   };
 

@@ -9,7 +9,8 @@ canvas {
 }
 
 #game-layer {
-  background-color: orange;
+  /*background-color: orange;*/
+  background: url(../images/desert_sand.jpg);
 }
 
 #ui-layer {
