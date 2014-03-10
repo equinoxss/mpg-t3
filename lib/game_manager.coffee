@@ -38,7 +38,7 @@ class GameManager
 
   generateHash: () ->
     text = ""
-    possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    possible = "ABCDEFGH" #JKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
     for i in [0..5]
       text += possible.charAt(Math.floor(Math.random() * possible.length))

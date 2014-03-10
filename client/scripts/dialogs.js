@@ -1,7 +1,8 @@
 var halfCell = null,
       titleBox = null,
       titlePos = null,
-      buttonBox = null;
+      buttonBox = null,
+      codeBox = null;
 
 function eraseTitleBackground() {
   uiContext.clearRect(titleBox.x, titleBox.y, titleBox.width(), titleBox.height());
@@ -38,6 +39,22 @@ function drawButtonBackground() {
   uiContext.fillRect(buttonBox.x, buttonBox.y, buttonBox.width(), buttonBox.height());
   uiContext.restore();
 };
+
+function drawGameCode() {
+  uiContext.clearRect(codeBox.x, codeBox.y, codeBox.width(), codeBox.height());
+  uiContext.save();
+  uiContext.fillStyle = "#C11B17";
+  uiContext.globalAlpha = 0.8;
+  uiContext.fillRect(codeBox.x, codeBox.y, codeBox.width(), codeBox.height());
+  uiContext.strokeRect(codeBox.x, codeBox.y, codeBox.width(), codeBox.height());
+  if (viewModel.enteredGameId) {
+    var size = codeBox.height() * .98;
+    uiContext.fillStyle = "black";
+    uiContext.font = size + "px sans-serif";
+    uiContext.fillText(viewModel.enteredGameId, codeBox.x + (size * .1), codeBox.y + codeBox.height() - (codeBox.height() * 0.1));
+  }
+  uiContext.restore();
+}
 
 function showGameStart() {
 
@@ -157,6 +174,41 @@ function joinWhichGame() {
   eraseButtonBackground();
   drawButtonBackground();
 
+  viewModel.enteredGameId = "";
+  viewModel.clickables = [];
+
+  for (var i=0;i<viewModel.playables.length;i++) {
+    viewModel.playables[i].symbol = "ABCDEDFGH"[i];
+    renderCell(viewModel.playables[i]);
+    viewModel.clickables.push({box: viewModel.playables[i].box, id: "click-letter"});    
+  }
+
+  var fontSize = (viewModel.cellSize * 0.2),
+      topLeft = { x: viewModel.grid[1][viewModel.cols-1].x - (viewModel.cellSize / 3),
+                  y: viewModel.grid[1][viewModel.cols-1].y + fontSize * 1.1};
+
+  uiContext.font = fontSize + "px sans-serif";
+  uiContext.fillText("Join A Game", topLeft.x, topLeft.y);
+
+  topLeft.y += 2*fontSize;
+  uiContext.font = (viewModel.cellSize * 0.12) + "px sans-serif";
+  uiContext.fillText("Enter a game code", topLeft.x, topLeft.y);
+
+  codeBox = new Rectangle(topLeft.x, topLeft.y + fontSize, topLeft.x + (viewModel.cellSize * 1.17) , topLeft.y + (2 * fontSize * 1.15));
+  drawGameCode();
+}
+
+function clickLetter(event) {
+  if (viewModel.clickables) {
+    if (viewModel.enteredGameId.length == 6) return;
+    for (var i=0;i<viewModel.clickables.length;i++) {
+      if (viewModel.clickables[i].box.contains(event.x, event.y)) {
+        viewModel.enteredGameId += viewModel.playables[i].symbol;
+        break;
+      }
+    }
+  }
+  drawGameCode();
 }
 
 function clickToButton() {

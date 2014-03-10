@@ -35,10 +35,11 @@ function hideDialog() {
 var clickMap = {
   'new-game' : function(event) { howManyPlayers(); },
   'what-game' : function(event) { joinWhichGame(); },
+  'click-letter': function(event) { clickLetter(event); },
   '2p-game' : function(event) { joinGame({np: 2}); },
   '3p-game' : function(event) { joinGame({np: 3}); },
   '4p-game' : function(event) { joinGame({np: 4}); },
-  'join-game' : function(event) { joinGame({gn: document.querySelector('#game-id').value || " "}); },
+  'join-game' : function(event) { joinGame({gn: viewModel.enteredGameId || " "}); },
   'another-game' : function(event) { gameServer.send('reset-game'); }
 }
 
@@ -52,12 +53,12 @@ document.addEventListener('click', function (event) {
     } else if (state == "starting") {
       var id = clickToButton(event);
       if (id && clickMap[id]) {
-        clickMap[id]();
+        clickMap[id](event);
       }
     } else if (state == 'playing') {
       var idx = clickToCell(event);
       if (idx !== null) {
-        gameServer.send('place-piece', {location: idx}, function(){})
+        gameServer.send('place-piece', {location: idx}, function(){});
       }
     }
   }

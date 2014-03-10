@@ -163,6 +163,11 @@ function drawPiece(sym, cell) {
       gameContext.lineTo(r.x2, r.y);
       gameContext.stroke();
       gameContext.closePath();
+    } else if (sym) {
+      gameContext.textAlign = "center";
+      gameContext.font = (viewModel.cellSize * 0.5).toString() + "px sans-serif";
+      var metrics = gameContext.measureText(sym);
+      gameContext.fillText(sym, r.x + (viewModel.cellSize / 2) - (metrics.width / 2), r.y + (viewModel.cellSize * 0.5));
     }
   } catch (e) {
     // ignore
